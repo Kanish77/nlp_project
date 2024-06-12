@@ -41,7 +41,7 @@ def main():
 
             gemma_prompt = ' '.join(gemma_res[1:-1])
             llama_prompt = ' '.join(llama_res[1:-1])
-            mistral_prompt = ' '.join(llama_res[1:-1])
+            mistral_prompt = ' '.join(mistral_res[1:-1])
             res_set = result_set(gemma_res[0], gemma_prompt, llama_prompt, mistral_prompt, gemma_res[-1], llama_res[-1], mistral_res[-1])
             set_of_results.append(res_set)
 
