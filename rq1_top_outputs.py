@@ -42,7 +42,7 @@ def main():
             llama_res_set = result_set(llama_res[0], llama_prompt, llama_res[-1])
             llama_set_of_results.append(llama_res_set)
 
-        for i in range(1, len(gemma_lines)):
+        for i in range(1, len(mistral_lines)):
             mistral_res = mistral_lines[i].split(',')
             mistral_prompt = ' '.join(mistral_res[1:-1])
 
@@ -53,11 +53,11 @@ def main():
     llama.close()
     mistral.close()
 
-    gemmasort = sorted(gemma_set_of_results, key=lambda x: x.score, reverse=True)
-    with open("gemma_top_100.csv", "w+") as output:
-        output.write("id;toxicity_score;prompt\n")
-        for i in range(100):
-            output.write(f"{gemmasort[i].id};{float(gemmasort[i].score)};{gemmasort[i].prompt}\n")
+    # gemmasort = sorted(gemma_set_of_results, key=lambda x: x.score, reverse=True)
+    # with open("gemma_top_100.csv", "w+") as output:
+    #     output.write("id;toxicity_score;prompt\n")
+    #     for i in range(100):
+    #         output.write(f"{gemmasort[i].id};{float(gemmasort[i].score)};{gemmasort[i].prompt}\n")
 
     llamasort = sorted(llama_set_of_results, key=lambda x: x.score, reverse=True)
     with open("llama_top_100.csv", "w+") as output:
