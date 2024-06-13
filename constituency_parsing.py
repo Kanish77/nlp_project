@@ -47,7 +47,7 @@ def main():
                 output.write(f";{sentence.constituency}")
 
                 cf = CanvasFrame()
-                t = Tree.fromstring(str(parsed_output.sentences[0].constituency))
+                t = Tree.fromstring(str(sentence.constituency))
                 tc = TreeWidget(cf.canvas(), t)
                 cf.add_widget(tc, 10, 10)  # (10,10) offsets
                 cf.print_to_file(f'./trees/tree{id}sentence{sentencenum}.ps')
