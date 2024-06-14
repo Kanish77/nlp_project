@@ -40,6 +40,20 @@ def get_from_tree(tree, target_string:str) -> (bool, list, list) :
         else:
             return False, res, labels
 
+def tree_to_sentence(tree) -> str:
+    print(tree)
+    if len(tree.children) == 0:
+        return tree.label
+
+    elif len(tree.children) == 1:
+        return tree_to_sentence(tree.children[0])
+
+    else:
+        res = ""
+        for child in tree.children:
+            child_sentence = tree_to_sentence(child)
+            res += child_sentence + " "
+        return res
 
 def main():
     set_of_trees = []
@@ -102,7 +116,7 @@ def main():
     #
     print("done with parsing")
     #
-    with open("constituency_outputs_real_quick.csv", "w+") as output:
+    with open("constituency_outputs_real_quick.csv", "w+") as output, open("constituency_outputs_coherent_sentences.csv", "w+") as output2:
         for i in range(len(token_list_in_order)):
             # response = set_of_responses[i]
             # id = set_of_ids[i]
@@ -116,6 +130,11 @@ def main():
             output.write("\n")
             # for response in set_of_responses:
 
+            output2.write(f'{top10[i]} subtree:\n')
+            for tree in token_list_in_order[i]:
+                output2.write(f'{tree_to_sentence(tree)}\n')
+
+            output2.write("\n")
             # output.write("\n")
             print(f'done with writing {i + 1} to file')
 
