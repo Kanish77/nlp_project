@@ -41,7 +41,7 @@ def get_from_tree(tree, target_string:str) -> (bool, list, list) :
             return False, res, labels
 
 def tree_to_sentence(tree) -> str:
-    print(tree)
+    # print(tree)
     if len(tree.children) == 0:
         return tree.label
 
@@ -58,6 +58,7 @@ def tree_to_sentence(tree) -> str:
 def main():
     set_of_trees = []
     tree_scores = []
+    set_of_ids = []
     # doc = nlp('This is a test. I am going to extend this ting')
     # set_of_responses.append(doc)
     sorted_tokens = pd.read_csv('pos_tag_analysis.csv')
@@ -72,8 +73,9 @@ def main():
             for j in range(2, len(constituent_line)):
                 tree = stanza.models.constituency.tree_reader.read_trees(constituent_line[j])[0]
                 set_of_trees.append(tree)
-                print(constituent_line[1])
+                # print(constituent_line[1])
                 tree_scores.append(constituent_line[1])
+                set_of_ids.append(constituent_line[0])
                 # print(tree.children[0].label)
             print(f"Built trees for line {i} out of 30")
     mistral.close()
@@ -87,26 +89,34 @@ def main():
     token_list_in_order = []
     token_labels_in_order = []
     token_scores_in_order = []
+    token_id_in_order = []
     for token in top10:
         # token = top10[i]
 
         total_set_of_token_outcomes = []
         total_set_of_token_labels = []
         total_set_of_token_scores = []
+        total_set_of_ids = []
         for i in range(len(set_of_trees)):
             tree = set_of_trees[i]
             score = float(tree_scores[i])
+            id = set_of_ids[i]
             # total_set_of_token_scores.append([])
             uselessboolean, subtree_list, tree_labels = get_from_tree(tree, token)
 
             if len(subtree_list) > 0:
+                print(len(subtree_list))
                 total_set_of_token_outcomes += subtree_list
                 total_set_of_token_labels += tree_labels
                 total_set_of_token_scores.append(score)
 
+                for i in range(len(subtree_list)):
+                    total_set_of_ids.append(id)
+
         token_list_in_order.append(total_set_of_token_outcomes)
         token_labels_in_order.append(total_set_of_token_labels)
         token_scores_in_order.append(total_set_of_token_scores)
+        token_id_in_order.append(total_set_of_ids)
 
     # for i in range(len(token_list_in_order)):
     #     print(token_list_in_order[i])
@@ -116,6 +126,7 @@ def main():
     #
     print("done with parsing")
     #
+    # print(f'token list shape: {token_list_in_order}')
     with open("constituency_outputs_real_quick.csv", "w+") as output, open("constituency_outputs_coherent_sentences.csv", "w+") as output2:
         for i in range(len(token_list_in_order)):
             # response = set_of_responses[i]
@@ -130,9 +141,11 @@ def main():
             output.write("\n")
             # for response in set_of_responses:
 
-            output2.write(f'{top10[i]} subtree:\n')
-            for tree in token_list_in_order[i]:
-                output2.write(f'{tree_to_sentence(tree)}\n')
+            output2.write(f'\'{top10[i]}\' subtree:\n')
+            for j in range(len(token_list_in_order[i])):
+                tree = token_list_in_order[i][j]
+                id = token_id_in_order[i][j]
+                output2.write(f'id:{id}, label: {token_labels_in_order[i][j]} - {tree_to_sentence(tree)}\n')
 
             output2.write("\n")
             # output.write("\n")
