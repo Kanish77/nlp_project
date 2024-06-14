@@ -8,10 +8,11 @@ def main():
     nlp = stanza.Pipeline(lang='en', processors='tokenize,pos,constituency')
     set_of_responses = []
     set_of_ids = []
+    set_of_scores = []
     # doc = nlp('This is a test. I am going to extend this ting')
     # set_of_responses.append(doc)
 
-    with open('mistral_top_100.csv') as mistral:
+    with open('mistral_sort_2.csv') as mistral:
         mistral_lines = mistral.readlines()
 
         for i in range(1, 31):
@@ -22,6 +23,7 @@ def main():
             parsed_output = nlp(mistral_out[-1])
             set_of_responses.append(parsed_output)
             set_of_ids.append(mistral_out[0])
+            set_of_scores.append(mistral_out[1])
 
             print(f"done with step {i} out of 30")
 
@@ -33,27 +35,28 @@ def main():
 
     print("done with parsing")
 
-    with open("constituency_mistral.csv", "w+") as output:
-        output.write("id;sentence1;sentence2, etc\n")
+    with open("constituency_mistral_inputs.csv", "w+") as output:
+        output.write("id;score;sentence1;sentence2, etc\n")
         for i in range(len(set_of_ids)):
             response = set_of_responses[i]
             id = set_of_ids[i]
-            output.write(f'{id}')
+            score = set_of_scores[i]
+            output.write(f'{id};{score}')
             # for response in set_of_responses:
 
-            sentencenum = 1
+            # sentencenum = 1
             for sentence in response.sentences:
                 # print(sentence.constituency)
                 output.write(f";{sentence.constituency}")
 
-                cf = CanvasFrame()
-                t = Tree.fromstring(str(sentence.constituency))
-                tc = TreeWidget(cf.canvas(), t)
-                cf.add_widget(tc, 10, 10)  # (10,10) offsets
-                cf.print_to_file(f'./trees/tree{id}sentence{sentencenum}.ps')
-                cf.destroy()
-
-                sentencenum += 1
+                # cf = CanvasFrame()
+                # t = Tree.fromstring(str(sentence.constituency))
+                # tc = TreeWidget(cf.canvas(), t)
+                # cf.add_widget(tc, 10, 10)  # (10,10) offsets
+                # cf.print_to_file(f'./input_trees/tree{id}sentence{sentencenum}.ps')
+                # cf.destroy()
+                #
+                # sentencenum += 1
 
             output.write("\n")
             print(f'done with writing {i + 1} to file')
